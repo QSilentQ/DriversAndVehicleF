@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { TextField } from '@mui/material';
 import { Driver } from '../../../domain/drivers/driver';
 import { DriversProvider } from '../../../domain/drivers/driversProvider';
 import { Vehicle } from '../../../domain/vehicles/vehicle';
@@ -10,12 +11,42 @@ import { Input } from '../../../shared/components/inputs/input';
 import { Modal } from '../../../shared/components/modals/modal';
 import { Notification } from '../../../shared/components/notification';
 import { Enum } from '../../../tools/types/enum';
+import { IMaskInput } from 'react-imask';
 
 interface Props {
 	vehicleId: string | null;
 	onClose: (isEdited: boolean) => void;
 	isOpen: boolean;
 }
+
+interface StateNumberMaskProps {
+	onChange: (event: { target: { name: string; value: string } }) => void;
+	name: string;
+	value?: string;
+}
+
+const toUpper = (s: string) => s.toUpperCase();
+const STATE_NUMBER_MASKS = [
+	{ mask: 'L 000 LL 000', definitions: { L: /[А-ЯЁ]/ }, prepare: toUpper },
+	{ mask: 'L 000 LL 00', definitions: { L: /[А-ЯЁ]/ }, prepare: toUpper }
+];
+
+const StateNumberMaskCustom = React.forwardRef<HTMLInputElement, StateNumberMaskProps>(
+	function StateNumberMaskCustom(props, ref) {
+		const { onChange, value, ...other } = props;
+		return (
+			<IMaskInput
+				{...other}
+				value={value ?? ''}
+				mask={STATE_NUMBER_MASKS}
+				inputRef={ref}
+				onAccept={(unmasked: string) => onChange({ target: { name: props.name, value: unmasked } })}
+				overwrite
+				unmask
+			/>
+		);
+	}
+);
 
 function getDriverFio(d: Driver) {
 	return [d.firstName, d.secondName, d.lastName].filter(Boolean).join(' ') || '—';
@@ -96,14 +127,20 @@ export function VehicleEditorModal(props: Props) {
 						onChange={(name) => setVehicleBlank((vehicleBlank) => ({ ...vehicleBlank, name }))}
 						required
 					/>
-					<Input
-						variant='text'
-						title='Введите гос. номер'
-						value={vehicleBlank.stateNumber}
-						onChange={(stateNumber) =>
-							setVehicleBlank((vehicleBlank) => ({ ...vehicleBlank, stateNumber }))
-						}
+					<TextField
+						label='Введите гос. номер'
+						placeholder='А 000 АА 777'
 						required
+						fullWidth
+						value={vehicleBlank.stateNumber ?? ''}
+						slotProps={{
+							input: {
+								inputComponent: StateNumberMaskCustom as any,
+								name: 'stateNumber',
+								onChange: (e: { target: { name: string; value: string } }) =>
+									setVehicleBlank((prev) => ({ ...prev, stateNumber: e.target.value || null }))
+							}
+						}}
 					/>
 					<Input
 						variant='select'
