@@ -16,10 +16,7 @@ namespace Goods.Scheduler
                 q.AddTrigger(opts => opts
                     .ForJob(jobKey)
                     .WithIdentity("reassingDrivers-trigger")
-                    .StartNow()
-                    .WithSimpleSchedule(x => x
-                        .WithIntervalInHours(24)
-                        .RepeatForever())
+                    .WithCronSchedule("0 0 3 * * ?")
                 );
             });
 
