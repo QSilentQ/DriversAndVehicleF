@@ -1,4 +1,5 @@
 using Goods.Domain.Drivers;
+using Goods.Domain.Histories;
 using Goods.Domain.Services;
 using Goods.Domain.Shared.Enums;
 using Goods.Domain.Vehicles;
@@ -8,7 +9,7 @@ using Goods.Tools.Types.Results;
 
 namespace Goods.Services.Vehicles;
 
-public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRepository driversRepository) : IVehicleService
+public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRepository driversRepository, IHistoryService historyService) : IVehicleService
 {
     private const Int32 MAX_VEHICLE_NAME_LENGTH = 255;
     private const Int32 MIN_AGE_FOR_BUS_YEARS = 21;
@@ -115,6 +116,7 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         Vehicle[] vehicles = vehiclesPage.Values;
         Driver[] drivers = driversPage.Values;
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+        List<(Guid VehicleId, Guid DriverId)> newAssignments = [];
 
         foreach (Vehicle vehicle in vehicles)
         {
@@ -136,13 +138,24 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
                 IsRemoved = vehicle.IsRemoved
             };
             vehiclesRepository.SaveVehicle(blank);
+
+            if (driverId is not null)
+                newAssignments.Add((vehicle.Id, driverId.Value));
         }
 
-
-        Guid?[] driversOnShiftIds = [.. vehicles.Select(v => v.DriverId).Where(id => id is not null)];
-        driversRepository.ClearVacationFromDrivers(driversOnShiftIds);
+        Guid[] driversOnShiftIds = [.. newAssignments.Select(a => a.DriverId)];
+        driversRepository.ClearVacationFromDrivers([.. driversOnShiftIds.Select(id => (Guid?)id)]);
         Guid?[] driversOnVacationIds = [.. drivers.Select(d => d.Id).Where(id => !driversOnShiftIds.Contains(id))];
         driversRepository.SetVacationFromDrivers(driversOnVacationIds);
+
+        foreach ((Guid vehicleId, Guid driverId) in newAssignments)
+        {
+            historyService.SaveHistory(new HistoryBlank {
+                VehicleId = vehicleId,
+                DriverId = driverId,
+                CreatedDatetimeUTC = DateTime.UtcNow
+            });
+        }
     }
 
     private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)
