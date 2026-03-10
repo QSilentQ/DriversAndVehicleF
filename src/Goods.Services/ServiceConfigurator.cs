@@ -2,6 +2,9 @@
 using Goods.Services.Drivers;
 using Goods.Services.Drivers.Repositories;
 using Goods.Services.Drivers.Repositories.Interfaces;
+using Goods.Services.Histories;
+using Goods.Services.Histories.Repositories;
+using Goods.Services.Histories.Repositories.Interfaces;
 using Goods.Services.Vehicles;
 using Goods.Services.Vehicles.Repositories;
 using Goods.Services.Vehicles.Repositories.Interfaces;
@@ -19,6 +22,9 @@ public static class ServiceConfigurator
 		collection.AddSingleton<IVehicleService, VehiclesService>();
 		collection.AddSingleton<IVehiclesRepository, VehiclesRepository>();
 
-		return collection;
+		collection.AddSingleton<IHistoryService, HistoriesService>();
+		collection.AddSingleton<IHistoryRepository, HistoriesRepository>();
+
+        return collection;
 	}
 }

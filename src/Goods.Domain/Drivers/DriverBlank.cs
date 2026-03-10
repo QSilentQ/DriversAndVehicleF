@@ -16,5 +16,6 @@ public class DriverBlank
     public Decimal? PayPerHour { get; set; }
     public DateTime? CreatedDatetimeUTC { get; set; }
     public DateTime ModifiedDatetimeUTC { get; set; }
+    public DateTime LastVacationDatetimeUTC { get; set; }
     public Boolean IsRemoved { get; set; }
 }

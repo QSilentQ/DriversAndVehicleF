@@ -72,4 +72,27 @@ internal class DriversRepository : IDriversRepository
             }
         );
     }
+
+    public void ClearVacationFromDrivers(Guid?[] driverIds)
+    {
+        DatabaseUtils.Execute(
+            Sql.SetVacationNull,
+            (parameters) =>
+            {
+                parameters.AddWithValue("p_driverIds", driverIds);
+            }
+        );
+    }
+
+    public void SetVacationToDrivers(Guid?[] driverIds)
+    {
+        DatabaseUtils.Execute(
+            Sql.SetVacationToday,
+            (parameters) =>
+            {
+                parameters.AddWithValue("p_driverIds", driverIds);
+                parameters.AddWithValue("p_current_datetime_utc", DateTime.UtcNow);
+            }
+        );
+    }
 }

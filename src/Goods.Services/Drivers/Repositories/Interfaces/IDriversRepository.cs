@@ -8,4 +8,6 @@ public interface IDriversRepository
     Page<Driver> GetDriversPage(Int32 page, Int32 countInPage);
     Driver? GetDriver(Guid vehicle_id);
     void MarkDriverAsRemoved(Guid vehicle_id);
+    void ClearVacationFromDrivers(Guid?[] driverIds);
+    void SetVacationFromDrivers(Guid?[] driverIds);
 }

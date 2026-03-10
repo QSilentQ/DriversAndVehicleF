@@ -60,5 +60,19 @@ internal static class Sql
                 modified_datetime_utc = @p_current_datetime_utc
 			WHERE id = @p_driver_id
 		";
+
+    internal static String SetVacationNull =>
+        @"
+            UPDATE drivers
+            SET last_vacation_datetime_utc = null
+            WHERE NOT is_removed AND id = ANY(@p_driverIds)
+        ";
+
+    internal static String SetVacationToday =>
+        @"
+            UPDATE drivers
+            SET last_vacation_datetime_utc = @p_current_datetime_utc
+            WHERE NOT is_removed AND id = ANY(@p_driverIds) AND last_vacation_datetime_utc NOT NULL
+        ";
 }
 

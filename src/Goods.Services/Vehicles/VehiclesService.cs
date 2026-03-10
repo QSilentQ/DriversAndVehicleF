@@ -137,6 +137,12 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
             };
             vehiclesRepository.SaveVehicle(blank);
         }
+
+
+        Guid?[] driversOnShiftIds = [.. vehicles.Select(v => v.DriverId).Where(id => id is not null)];
+        driversRepository.ClearVacationFromDrivers(driversOnShiftIds);
+        Guid?[] driversOnVacationIds = [.. drivers.Select(d => d.Id).Where(id => !driversOnShiftIds.Contains(id))];
+        driversRepository.SetVacationFromDrivers(driversOnVacationIds);
     }
 
     private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)

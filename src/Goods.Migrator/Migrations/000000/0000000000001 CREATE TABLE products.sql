@@ -10,6 +10,7 @@ CREATE TABLE drivers (
   pay_per_hour float(8) NULL,
   created_datetime_utc timestamp NOT NULL,
   modified_datetime_utc timestamp NULL,
+  last_vacation_datetime_utc timestamp NULL,
   is_removed bool NULL,
   CONSTRAINT drivers_pk PRIMARY KEY (id)
 );
@@ -27,3 +28,10 @@ CREATE TABLE vehicles (
   is_removed bool NULL,
   CONSTRAINT vehicles_pk PRIMARY KEY (id)
 );
+
+CREATE TABLE history (
+	id uuid NOT NULL,
+	driver_id uuid NOT NULL,
+	vehicle_id uuid NOT NULL,
+	datetime_utc timestamp NOT NULL
+)
