@@ -1,8 +1,7 @@
 using Goods.Domain.Drivers;
-using Goods.Domain.Drivers.Enums;
 using Goods.Domain.Services;
+using Goods.Domain.Shared.Enums;
 using Goods.Domain.Vehicles;
-using Goods.Domain.Vehicles.Enums;
 using Goods.Services.Drivers.Repositories.Interfaces;
 using Goods.Services.Vehicles.Repositories.Interfaces;
 using Goods.Tools.Types.Results;
@@ -48,11 +47,11 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
             if (driver is null)
                 return Result.Failed("Выбранный водитель не найден.");
 
-            LicenseCategory requiredCategory = (LicenseCategory)(Int32)vehicleBlank.VehicleCategory!.Value;
+            LicenseCategory requiredCategory = vehicleBlank.VehicleCategory!.Value;
             if (driver.DriverLicenseCategory is null || !driver.DriverLicenseCategory.Contains(requiredCategory))
                 return Result.Failed($"Для управления данным транспортным средством водителю нужна категория прав - {requiredCategory}.");
 
-            if (vehicleBlank.VehicleCategory == VehicleCategory.Buses)
+            if (vehicleBlank.VehicleCategory == LicenseCategory.Buses)
             {
                 DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
                 Int32 age = FullYears(driver.Birthday, today);
@@ -120,13 +119,11 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         foreach (Vehicle vehicle in vehicles)
         {
             Guid? driverId = null;
-            Driver[] validDrivers = drivers
-                .Where(d => IsDriverValidForVehicle(d, vehicle, today))
-                .ToArray();
+            Driver[] validDrivers = [.. drivers.Where(driver => IsDriverValidForVehicle(driver, vehicle, today))];
             if (validDrivers.Length > 0)
                 driverId = validDrivers[Random.Shared.Next(validDrivers.Length)].Id;
 
-            VehicleBlank blank = new VehicleBlank
+            VehicleBlank blank = new()
             {
                 Id = vehicle.Id,
                 DriverId = driverId,
@@ -142,13 +139,13 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         }
     }
 
-    private Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)
+    private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)
     {
-        LicenseCategory requiredCategory = (LicenseCategory)(Int32)vehicle.VehicleCategory;
+        LicenseCategory requiredCategory = vehicle.VehicleCategory;
         if (driver.DriverLicenseCategory is null || !driver.DriverLicenseCategory.Contains(requiredCategory))
             return false;
 
-        if (vehicle.VehicleCategory == VehicleCategory.Buses)
+        if (vehicle.VehicleCategory == LicenseCategory.Buses)
         {
             Int32 age = FullYears(driver.Birthday, today);
             Int32 experienceYears = FullYears(driver.Experience, today);

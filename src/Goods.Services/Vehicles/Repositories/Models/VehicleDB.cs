@@ -1,4 +1,4 @@
-﻿using Goods.Domain.Vehicles.Enums;
+using Goods.Domain.Shared.Enums;
 
 namespace Goods.Services.Vehicles.Repositories.Models;
 
@@ -7,7 +7,7 @@ public class VehicleDb(
     Guid? driverId,
     String name,
     String stateNumber,
-    VehicleCategory vehicleCategory,
+    LicenseCategory vehicleCategory,
     Decimal averageSpeed,
     Decimal fuelConsumption,
     DateTime createdDatetimeUTC,
@@ -18,7 +18,7 @@ public class VehicleDb(
     public Guid? DriverId { get; set; } = driverId;
     public String Name { get; set; } = name;
     public String StateNumber { get; set; } = stateNumber;
-    public VehicleCategory VehicleCategory { get; set; } = vehicleCategory;
+    public LicenseCategory VehicleCategory { get; set; } = vehicleCategory;
     public Decimal AverageSpeed { get; set; } = averageSpeed;
     public Decimal FuelConsumption { get; set; } = fuelConsumption;
     public DateTime CreatedDatetimeUTC { get; set; } = createdDatetimeUTC;

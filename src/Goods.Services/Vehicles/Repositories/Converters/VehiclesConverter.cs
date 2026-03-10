@@ -1,5 +1,5 @@
-﻿using Goods.Domain.Vehicles;
-using Goods.Domain.Vehicles.Enums;
+using Goods.Domain.Shared.Enums;
+using Goods.Domain.Vehicles;
 using Goods.Services.Vehicles.Repositories.Models;
 using Npgsql;
 
@@ -31,7 +31,7 @@ internal static class VehiclesConverter
                 : reader.GetGuid(reader.GetOrdinal("driver_id")),
             reader.GetString(reader.GetOrdinal("name")),
             reader.GetString(reader.GetOrdinal("state_number")),
-            (VehicleCategory)reader.GetInt32(reader.GetOrdinal("vehicle_category")),
+            (LicenseCategory)reader.GetInt32(reader.GetOrdinal("vehicle_category")),
             Convert.ToDecimal(reader.GetFloat(reader.GetOrdinal("average_speed"))),
             Convert.ToDecimal(reader.GetFloat(reader.GetOrdinal("fuel_consumption"))),
             reader.GetDateTime(reader.GetOrdinal("created_datetime_utc")),

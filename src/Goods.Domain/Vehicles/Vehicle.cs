@@ -1,4 +1,4 @@
-﻿using Goods.Domain.Vehicles.Enums;
+using Goods.Domain.Shared.Enums;
 
 namespace Goods.Domain.Vehicles;
 
@@ -7,7 +7,7 @@ public class Vehicle(
     Guid? driverId,
     String name,
     String stateNumber, 
-    VehicleCategory vehicleCategory,
+    LicenseCategory vehicleCategory,
     Decimal averageSpeed,
     Decimal fuelConsumption,
     Boolean isRemoved)
@@ -16,7 +16,7 @@ public class Vehicle(
     public Guid? DriverId { get; } = driverId;
     public String Name { get; } = name;
     public String StateNumber { get; } = stateNumber;
-    public VehicleCategory VehicleCategory { get; } = vehicleCategory;
+    public LicenseCategory VehicleCategory { get; } = vehicleCategory;
     public Decimal AverageSpeed { get; } = averageSpeed;
     public Decimal FuelConsumption { get; } = fuelConsumption;
     public Boolean IsRemoved { get; } = isRemoved;

@@ -1,5 +1,4 @@
 using Goods.Domain.Drivers;
-using Goods.Domain.Drivers.Enums;
 using Goods.Services.Drivers.Repositories.Converters;
 using Goods.Services.Drivers.Repositories.Interfaces;
 using Goods.Services.Drivers.Repositories.Models;

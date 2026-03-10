@@ -1,4 +1,4 @@
-using Goods.Domain.Drivers.Enums;
+using Goods.Domain.Shared.Enums;
 
 namespace Goods.Domain.Drivers;
 

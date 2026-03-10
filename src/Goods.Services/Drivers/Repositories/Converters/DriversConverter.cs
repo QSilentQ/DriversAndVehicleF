@@ -1,5 +1,5 @@
 using Goods.Domain.Drivers;
-using Goods.Domain.Drivers.Enums;
+using Goods.Domain.Shared.Enums;
 using Goods.Services.Drivers.Repositories.Models;
 using Npgsql;
 
