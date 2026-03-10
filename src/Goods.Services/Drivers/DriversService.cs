@@ -1,6 +1,6 @@
 using Goods.Domain.Drivers;
-using Goods.Domain.Drivers.Enums;
 using Goods.Domain.Services;
+using Goods.Domain.Drivers.Enums;
 using Goods.Services.Drivers.Repositories.Interfaces;
 using Goods.Tools.Types.Results;
 
