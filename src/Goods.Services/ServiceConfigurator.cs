@@ -1,0 +1,30 @@
+﻿using Goods.Domain.Services;
+using Goods.Services.Drivers;
+using Goods.Services.Drivers.Repositories;
+using Goods.Services.Drivers.Repositories.Interfaces;
+using Goods.Services.Products;
+using Goods.Services.Products.Repositories;
+using Goods.Services.Products.Repositories.Interfaces;
+using Goods.Services.Vehicles;
+using Goods.Services.Vehicles.Repositories;
+using Goods.Services.Vehicles.Repositories.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Goods.Services;
+
+public static class ServiceConfigurator
+{
+	public static IServiceCollection AddServices(this IServiceCollection collection)
+	{
+		collection.AddSingleton<IProductsService, ProductsService>();
+        collection.AddSingleton<IProductsRepository, ProductsRepository>();
+
+		collection.AddSingleton<IDriverService, DriversService>();
+		collection.AddSingleton<IDriversRepository, DriversRepository>();
+
+		collection.AddSingleton<IVehicleService, VehiclesService>();
+		collection.AddSingleton<IVehiclesRepository, VehiclesRepository>();
+
+		return collection;
+	}
+}

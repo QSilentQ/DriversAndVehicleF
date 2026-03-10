@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+	<ItemGroup>
+		<Compile Remove="client-app\**" />
+		<Content Remove="client-app\**" />
+		<EmbeddedResource Remove="client-app\**" />
+		<None Remove="client-app\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Goods.Domain\Goods.Domain.csproj" />
+		<ProjectReference Include="..\Goods.Scheduler\Goods.Scheduler.csproj" />
+		<ProjectReference Include="..\Goods.Services\Goods.Services.csproj" />
+		<ProjectReference Include="..\Goods.Tools\Goods.Tools.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
+	</ItemGroup>
+</Project>
