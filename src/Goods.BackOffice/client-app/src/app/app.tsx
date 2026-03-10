@@ -4,7 +4,6 @@ import { AppBase } from '../shared/components/appBase';
 import { Layout } from '../shared/components/layout';
 import { DriversRouter } from './drivers/router/driversRouter';
 import { InfrastructureRouter } from './infrastructure/router/infrastructureRouter';
-import { ProductsRouter } from './products/router/productsRouter';
 import { VehiclesRouter } from './vehicles/router/vehiclesRouter';
 
 export function App() {
@@ -14,7 +13,6 @@ export function App() {
 				<Routes>
 					<Route element={<Layout />}>
 						{InfrastructureRouter()}
-						{ProductsRouter()}
 						{DriversRouter()}
 						{VehiclesRouter()}
 					</Route>

@@ -4,7 +4,7 @@ namespace Goods.Tools.Utils;
 
 public static class DatabaseUtils
 {
-	private const String _connectionString = "Server=localhost;Username=postgres;Password=123;Database=goods";
+	private const String _connectionString = "Server=localhost;Username=postgres;Password=1234;Database=goods";
 
 	public static Int32 Execute(String sql, Action<NpgsqlParameterCollection> getParameters) =>
 		UseSqlCommand(sql, getParameters, (command) => command.ExecuteNonQuery());

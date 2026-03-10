@@ -2,7 +2,6 @@
 
 namespace Goods.Migrator;
 
-//TODO
 public class Migrator : IHostedService
 {
 	public Task StartAsync(CancellationToken cancellationToken)
