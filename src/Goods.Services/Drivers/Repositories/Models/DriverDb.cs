@@ -15,6 +15,7 @@ public class DriverDb(
     Decimal payPerHour,
     DateTime createdDateTimeUTC,
     DateTime? modifiedDateTimeUTC,
+    DateTime? lastVacationDatetimeUtc,
     Boolean isRemoved)
 {
     public Guid Id { get; set; } = id;
@@ -28,5 +29,6 @@ public class DriverDb(
     public Decimal PayPerHour { get; set; } = payPerHour;
     public DateTime CreatedDateTimeUTC { get; set; } = createdDateTimeUTC;
     public DateTime? ModifiedDateTimeUTC { get; set; } = modifiedDateTimeUTC;
+    public DateTime? LastVacationDatetimeUtc { get; set; } = lastVacationDatetimeUtc;
     public Boolean IsRemoved { get; set; } = isRemoved;
 }

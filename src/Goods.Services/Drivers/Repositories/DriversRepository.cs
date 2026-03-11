@@ -84,7 +84,7 @@ internal class DriversRepository : IDriversRepository
         );
     }
 
-    public void SetVacationToDrivers(Guid?[] driverIds)
+    public void SetVacationFromDrivers(Guid?[] driverIds)
     {
         DatabaseUtils.Execute(
             Sql.SetVacationToday,

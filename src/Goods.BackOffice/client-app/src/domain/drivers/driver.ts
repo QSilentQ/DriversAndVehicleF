@@ -13,6 +13,7 @@ export class Driver {
     public readonly birthday: Date,
     public readonly experience: Date,
     public readonly payPerHour: number,
+    public readonly lastVacationDatetimeUtc: Date | null,
   ) {}
 }
 
@@ -26,6 +27,7 @@ export function mapToDrivers(data: any[]): Driver[] {
 
 export function mapToDriver(data: any): Driver {
   const category = data.driverLicenseCategory;
+  const lastVacation = data.lastVacationDatetimeUtc;
   return new Driver(
     data.id,
     data.firstName,
@@ -36,5 +38,6 @@ export function mapToDriver(data: any): Driver {
     data.birthday,
     data.experience,
     data.payPerHour,
+    lastVacation != null ? new Date(lastVacation) : null,
   );
 }

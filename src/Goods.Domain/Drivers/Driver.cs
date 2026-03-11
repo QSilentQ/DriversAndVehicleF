@@ -13,6 +13,7 @@ public class Driver(
     DateOnly experience,
     DateOnly birthday,
     Decimal payPerHour,
+    DateTime? lastVacationDatetimeUtc,
     Boolean isRemoved)
 {
     public Guid Id { get; } = id;
@@ -24,5 +25,6 @@ public class Driver(
     public DateOnly Birthday { get; } = birthday;
     public DateOnly Experience { get; } = experience;
     public Decimal PayPerHour { get; } = payPerHour;
+    public DateTime? LastVacationDatetimeUtc { get; } = lastVacationDatetimeUtc;
     public Boolean IsRemoved { get; } = isRemoved;
 }

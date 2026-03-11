@@ -117,8 +117,12 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         Driver[] drivers = driversPage.Values;
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
         List<(Guid VehicleId, Guid DriverId)> newAssignments = [];
+        Vehicle[] priorityVehicles = vehicles
+            .OrderBy(v => drivers.FirstOrDefault(d => d.Id == v.DriverId)?.LastVacationDatetimeUtc is null)
+            .ThenBy(v => drivers.FirstOrDefault(d => d.Id == v.DriverId)?.LastVacationDatetimeUtc ?? DateTime.MaxValue)
+            .ToArray();
 
-        foreach (Vehicle vehicle in vehicles)
+        foreach (Vehicle vehicle in priorityVehicles)
         {
             Guid? driverId = null;
             Driver[] validDrivers = [.. drivers.Where(driver => IsDriverValidForVehicle(driver, vehicle, today))];

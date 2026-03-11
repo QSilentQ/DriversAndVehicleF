@@ -22,6 +22,7 @@ internal static class DriversConverter
             driverDb.Experience,
             driverDb.Birthday,
             driverDb.PayPerHour,
+            driverDb.LastVacationDatetimeUtc,
             driverDb.IsRemoved
         );
     }
@@ -42,6 +43,9 @@ internal static class DriversConverter
             reader.IsDBNull(reader.GetOrdinal("modified_datetime_utc"))
                 ? null
                 : reader.GetDateTime(reader.GetOrdinal("modified_datetime_utc")),
+            reader.IsDBNull(reader.GetOrdinal("last_vacation_datetime_utc"))
+                ? null
+                : reader.GetDateTime(reader.GetOrdinal("last_vacation_datetime_utc")),
             reader.GetBoolean(reader.GetOrdinal("is_removed"))
         );
     }
