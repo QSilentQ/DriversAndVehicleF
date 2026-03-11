@@ -38,7 +38,6 @@ function formatDate(d: Date): string {
 
 export function DriversPage() {
 	const [drivers, setDrivers] = useState<Driver[]>([]);
-	const [assignedDriverIds, setAssignedDriverIds] = useState<Set<string>>(new Set());
 	const [pagination, setPagination] = useState<Pagination>(Pagination.default);
 
 	const [driverEditorModalState, setDriverEditorModalState] = useState<DriverEditorModalState>({
@@ -55,13 +54,12 @@ export function DriversPage() {
 	}, []);
 
 	async function loadDriversPage(newPagination: Pagination) {
-		const [driversPage, ids] = await Promise.all([
-			DriversProvider.getDriversPage(newPagination.page, newPagination.countInPage),
-			DriversProvider.getAssignedDriverIds()
-		]);
+		const driversPage = await DriversProvider.getDriversPage(
+			newPagination.page,
+			newPagination.countInPage
+		);
 
 		setDrivers(driversPage.values);
-		setAssignedDriverIds(new Set(ids));
 		setPagination((pagination) => ({
 			...pagination,
 			page: newPagination.page,
@@ -96,6 +94,19 @@ export function DriversPage() {
 			driverId,
 			...ConfirmModalState.getOpen(`Вы действительно хотите удалить водителя "${fio}"?`)
 		});
+	}
+
+	function getDriverStatus(driver: Driver): string {
+		const vacation = driver.lastVacationDatetimeUtc;
+		if (vacation == null) return "На смене"
+
+		const today = new Date()
+		today.setUTCHours(0, 0, 0);
+		const vacationStarts = new Date(vacation)
+		vacationStarts.setUTCHours(0, 0, 0);
+		const days = Math.floor((today.getTime() - vacationStarts.getTime()) / (24 * 60 * 60 * 1000));
+
+		return `В отпуске (${days} дней)`;
 	}
 
 	function calculateDriverExperience(experience: Date) {
@@ -175,9 +186,7 @@ export function DriversPage() {
 										<TableCell width='12%'>{formatDate(driver.birthday)}</TableCell>
 										<TableCell width='12%'>{calculateDriverExperience(driver.experience)}</TableCell>
 										<TableCell width='12%'>{driver.payPerHour ?? '—'}</TableCell>
-										<TableCell width='10%'>
-											{assignedDriverIds.has(driver.id) ? 'За рулём' : 'В отпуске'}
-										</TableCell>
+										<TableCell width='10%'>{getDriverStatus(driver)}</TableCell>
 										<TableCell width='12%'>
 											<Button
 												type='icon'
