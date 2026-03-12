@@ -79,4 +79,17 @@ internal class VehiclesRepository : IVehiclesRepository
             (reader) => reader.GetGuid(0)
         );
     }
+
+    public void UpdateDriverForVehicle(Guid vehicleId, Guid? driverId)
+    {
+        DatabaseUtils.Execute(
+            Sql.UpdateDriverForVehicle,
+            (parametres) =>
+            {
+                parametres.AddWithValue("p_vehicle_id", vehicleId);
+                parametres.AddWithValue("p_driver_id", (Object?)driverId ?? DBNull.Value);
+                parametres.AddWithValue("p_current_datetime_utc", DateTime.UtcNow);
+            }
+        );
+    }
 }

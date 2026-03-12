@@ -57,5 +57,11 @@ internal static class Sql
 
     internal static String GetAssignedDriverIds =>
         "SELECT DISTINCT driver_id FROM vehicles WHERE NOT is_removed AND driver_id IS NOT NULL";
+
+    internal static String UpdateDriverForVehicle =>
+        @"UPDATE vehicles
+        SET driver_id = @p_driver_id,
+            modified_datetime_utc = @p_current_datetime_utc 
+        WHERE vehicle_id = @p_vehicle_id";
 }
 

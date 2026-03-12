@@ -9,4 +9,5 @@ public interface IVehiclesRepository
     Vehicle? GetVehicle(Guid vehicle_id);
     void MarkVehicleAsRemoved(Guid vehicle_id);
     IReadOnlyList<Guid> GetAssignedDriverIds();
+    void UpdateDriverForVehicle(Guid vehicle_id, Guid? driver_id);
 }

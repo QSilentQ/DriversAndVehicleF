@@ -150,7 +150,7 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
                 ModifiedDatetimeUTC = DateTime.UtcNow,
                 IsRemoved = vehicle.IsRemoved
             };
-            vehiclesRepository.SaveVehicle(blank);
+            vehiclesRepository.UpdateDriverForVehicle(vehicle.Id, driverId);
 
             if (driverId is not null)
                 newAssignments.Add((vehicle.Id, driverId.Value));
