@@ -7,7 +7,7 @@ namespace Goods.Services.Vehicles.Repositories.Converters;
 
 internal static class VehiclesConverter
 {
-    internal static Vehicle[] ToVehicles(this VehicleDb[] vehicleDbs) => [.. vehicleDbs.Select(ToVehicle)];
+    internal static Vehicle[] ToVehicles(this VehicleDb[] vehicleDbs) => vehicleDbs.Select(ToVehicle).ToArray();
 
     internal static Vehicle ToVehicle(this VehicleDb vehicleDb)
     {

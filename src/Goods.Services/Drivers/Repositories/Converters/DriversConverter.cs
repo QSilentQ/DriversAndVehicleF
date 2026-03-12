@@ -8,7 +8,7 @@ namespace Goods.Services.Drivers.Repositories.Converters;
 
 internal static class DriversConverter
 {
-    internal static Driver[] ToDrivers(this DriverDb[] driverDBs) => [.. driverDBs.Select(ToDriver)];
+    internal static Driver[] ToDrivers(this DriverDb[] driverDBs) => driverDBs.Select(ToDriver).ToArray();
 
     internal static Driver ToDriver(this DriverDb driverDb)
     {

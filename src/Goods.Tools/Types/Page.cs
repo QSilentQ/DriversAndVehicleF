@@ -7,6 +7,6 @@ public readonly struct Page<T>(T[] values, Int32 totalRows)
 
 	public Page<TConverted> Convert<TConverted>(Func<T, TConverted> converter)
 	{
-		return new Page<TConverted>([.. Values.Select(converter)], TotalRows);
+		return new Page<TConverted>(Values.Select(converter).ToArray(), TotalRows);
 	}
 }

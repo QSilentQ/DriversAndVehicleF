@@ -95,4 +95,31 @@ internal class DriversRepository : IDriversRepository
             }
         );
     }
+
+    public Driver[] GetAllDrivers()
+    {
+        return DatabaseUtils
+            .GetList<DriverDb>(
+                Sql.GetAllDrivers,
+                parameters => { },
+                (reader) => reader.ToDriverDb()
+            )
+            .ToArray()
+            .ToDrivers();
+    }
+
+    public Driver[] GetDriversByIds(Guid[] driverIds)
+    {
+        return DatabaseUtils
+            .GetList<DriverDb>(
+                Sql.GetDriversByIds,
+                parameters =>
+                {
+                    parameters.AddWithValue("p_driverIds", driverIds);
+                },
+                (reader) => reader.ToDriverDb()
+            )
+            .ToArray()
+            .ToDrivers();
+    }
 }

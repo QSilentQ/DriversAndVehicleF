@@ -59,4 +59,20 @@ export class VehiclesProvider {
     
     return { totalPrice: Number(json) };
   }
+
+  public static async getCountAvailibleVehicles(driverIds: string[]): Promise<number | 0> {
+    let params = '';
+    for (const id of driverIds) {
+      params += `driverIds=${id}&`;
+    }
+    params = params.slice(0, -1);
+
+    const response = await fetch(`/vehicles/get_count_availible_vehicles?${params}`, {
+      method: 'GET',
+      headers: this.headers
+    })
+    const json = await response.json();
+
+    return Number(json);
+  }
 }

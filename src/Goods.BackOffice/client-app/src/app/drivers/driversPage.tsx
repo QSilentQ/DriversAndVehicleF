@@ -21,6 +21,7 @@ import { TablePagination } from '../../shared/components/tablePagination';
 import { ConfirmModalState } from '../../shared/types/confirmModalState';
 import { Pagination } from '../../tools/types/pagination';
 import { DriverEditorModal } from './modals/driverEditorModal';
+import { VehiclesProvider } from '../../domain/vehicles/vehicleProvider';
 
 type DriverEditorModalState = {
 	driverId: string | null;
@@ -60,6 +61,8 @@ export function DriversPage() {
 		);
 
 		setDrivers(driversPage.values);
+		getCountAvailibleVehicles(driversPage.values);
+
 		setPagination((pagination) => ({
 			...pagination,
 			page: newPagination.page,
@@ -94,6 +97,10 @@ export function DriversPage() {
 			driverId,
 			...ConfirmModalState.getOpen(`Вы действительно хотите удалить водителя "${fio}"?`)
 		});
+	}
+
+	function getCountAvailibleVehicles(drivers: Driver[]) {
+		return VehiclesProvider.getCountAvailibleVehicles(drivers.map((driver) => driver.id));
 	}
 
 	function getDriverStatus(driver: Driver): string {
@@ -160,6 +167,7 @@ export function DriversPage() {
 								<TableCell>Стаж, лет</TableCell>
 								<TableCell>Оплата/час</TableCell>
 								<TableCell>Статус</TableCell>
+								<TableCell>Доступные ТС, шт.</TableCell>
 								<TableCell>Управление</TableCell>
 							</TableRow>
 						</TableHead>
@@ -187,6 +195,7 @@ export function DriversPage() {
 										<TableCell width='12%'>{calculateDriverExperience(driver.experience)}</TableCell>
 										<TableCell width='12%'>{driver.payPerHour ?? '—'}</TableCell>
 										<TableCell width='10%'>{getDriverStatus(driver)}</TableCell>
+										<TableCell width='10%'>{/* Сюда */}</TableCell>
 										<TableCell width='12%'>
 											<Button
 												type='icon'

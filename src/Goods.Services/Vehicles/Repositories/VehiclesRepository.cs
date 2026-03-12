@@ -1,9 +1,11 @@
+using Goods.Domain.Shared.Enums;
 using Goods.Domain.Vehicles;
 using Goods.Services.Vehicles.Repositories.Converters;
 using Goods.Services.Vehicles.Repositories.Interfaces;
 using Goods.Services.Vehicles.Repositories.Models;
 using Goods.Services.Vehicles.Repositories.Queries;
 using Goods.Tools.Utils;
+using System.ComponentModel;
 using static Goods.Tools.Utils.NumberUtils;
 
 namespace Goods.Services.Vehicles.Repositories;
@@ -43,6 +45,18 @@ internal class VehiclesRepository : IVehiclesRepository
                 (reader) => reader.ToVehicleDb()
             )
             .Convert(vehicleDb => vehicleDb.ToVehicle());
+    }
+
+    public Vehicle[] GetAllVehicles()
+    {
+        return DatabaseUtils
+            .GetList<VehicleDb>(
+                Sql.GetAllVehicles,
+                parameters => { },
+                (reader) => reader.ToVehicleDb()
+            )
+            .ToArray()
+            .ToVehicles();
     }
 
     public Vehicle? GetVehicle(Guid vehicleId)
@@ -91,5 +105,20 @@ internal class VehiclesRepository : IVehiclesRepository
                 parametres.AddWithValue("p_current_datetime_utc", DateTime.UtcNow);
             }
         );
+    }
+
+    public Vehicle[] GetVehiclesByCategory(LicenseCategory[] license_categories)
+    {
+        return DatabaseUtils
+            .GetList<VehicleDb>(
+                Sql.GetVehiclesByCategory,
+                parameters =>
+                {
+                    parameters.AddWithValue("p_license_categories", license_categories);
+                },
+                (reader) => reader.ToVehicleDb()
+            )
+            .ToArray()
+            .ToVehicles();
     }
 }

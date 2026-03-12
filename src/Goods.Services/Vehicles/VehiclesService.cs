@@ -5,6 +5,7 @@ using Goods.Domain.Shared.Enums;
 using Goods.Domain.Vehicles;
 using Goods.Services.Drivers.Repositories.Interfaces;
 using Goods.Services.Vehicles.Repositories.Interfaces;
+using Goods.Tools.Extensions;
 using Goods.Tools.Types.Results;
 
 namespace Goods.Services.Vehicles;
@@ -102,10 +103,8 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
 
     public void ReassignDriversRandomly()
     {
-        Page<Vehicle> vehiclesPage = vehiclesRepository.GetVehiclesPage(1, 1000);
-        Page<Driver> driversPage = driversRepository.GetDriversPage(1, 1000);
-        Vehicle[] vehicles = vehiclesPage.Values;
-        Driver[] drivers = driversPage.Values;
+        Vehicle[] vehicles = vehiclesRepository.GetAllVehicles();
+        Driver[] drivers = driversRepository.GetAllDrivers();
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
         List<(Guid VehicleId, Guid DriverId)> newAssignments = [];
         HashSet<Guid> assignedDriverIds = [];
@@ -113,7 +112,7 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         foreach (Vehicle vehicle in vehicles)
         {
             Guid? driverId = null;
-            Driver[] validDrivers = [.. drivers.Where(driver => IsDriverValidForVehicle(driver, vehicle, today))];
+            Driver[] validDrivers = drivers.Where(driver => IsDriverValidForVehicle(driver, vehicle, today)).ToArray();
             Driver[] priorityValidDrivers = validDrivers
                 .Where(driver => driver.LastVacationDatetimeUtc is not null && !assignedDriverIds.Contains(driver.Id))
                 .OrderBy(driver => driver.LastVacationDatetimeUtc)
@@ -135,9 +134,17 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
                 newAssignments.Add((vehicle.Id, driverId.Value));
         }
 
-        Guid[] driversOnShiftIds = [.. newAssignments.Select(a => a.DriverId)];
-        driversRepository.ClearVacationFromDrivers([.. driversOnShiftIds.Select(id => (Guid?)id)]);
-        Guid?[] driversOnVacationIds = [.. drivers.Select(d => d.Id).Where(id => !driversOnShiftIds.Contains(id))];
+        Guid[] driversOnShiftIds = newAssignments
+            .Select(a => a.DriverId)
+            .ToArray();
+        driversRepository.ClearVacationFromDrivers(driversOnShiftIds
+            .Select(id => (Guid?)id)
+            .ToArray());
+        Guid?[] driversOnVacationIds = drivers
+            .Select(d => d.Id)
+            .Where(id => !driversOnShiftIds.Contains(id))
+            .Select(id => (Guid?)id)
+            .ToArray();
         driversRepository.SetVacationFromDrivers(driversOnVacationIds);
 
         foreach ((Guid vehicleId, Guid driverId) in newAssignments)
@@ -157,8 +164,8 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
 
         if (vehicleCategory == LicenseCategory.Buses)
         {
-            Int32 age = FullYears(driver.Birthday, today);
-            Int32 experience = FullYears(driver.Experience, today);
+            Int32 age = driver.Birthday.GetFullYearsCount(today);
+            Int32 experience = driver.Experience.GetFullYearsCount(today);
 
             if (age < MIN_AGE_FOR_BUS_YEARS)
                 return Result.Failed($"Для управления автобусом водителю должно быть не менее {MIN_AGE_FOR_BUS_YEARS} лет.");
@@ -170,15 +177,25 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         return Result.Success();
     }
 
+    public Int32 GetCountAvailibleVehicles(Guid[] driverIds)
+    {
+        Driver[] drivers = driversRepository.GetDriversByIds(driverIds);
+        DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        LicenseCategory[] licenseCategories = drivers
+            .SelectMany(driver => driver.DriverLicenseCategory)
+            .Distinct()
+            .ToArray();
+
+        Vehicle[] vehicles = vehiclesRepository.GetVehiclesByCategory(licenseCategories);
+
+        Int32 count = 0;
+
+        return count;
+    }
+
     private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)
     {
         return ValidateDriverForVehicle(driver, vehicle.VehicleCategory, today).IsSuccess;
-    }
-
-    private static Int32 FullYears(DateOnly from, DateOnly to)
-    {
-        Int32 years = to.Year - from.Year;
-        if (from.AddYears(years) > to) years--;
-        return years;
     }
 }

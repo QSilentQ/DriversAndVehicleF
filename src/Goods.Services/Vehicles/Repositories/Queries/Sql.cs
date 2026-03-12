@@ -45,6 +45,13 @@ internal static class Sql
 			LIMIT @p_limit
 		";
 
+    internal static String GetAllVehicles =>
+        @"
+            SELECT * FROM vehicles
+            WHERE NOT is_removed
+            ORDER BY created_datetime_utc DESC
+        ";
+
     internal static String GetVehicleById => "SELECT * FROM vehicles WHERE id = @p_vehicle_id AND NOT is_removed";
 
     internal static String MarkVehicleAsRemoved =>
@@ -63,5 +70,12 @@ internal static class Sql
         SET driver_id = @p_driver_id,
             modified_datetime_utc = @p_current_datetime_utc 
         WHERE vehicle_id = @p_vehicle_id";
+
+    internal static String GetVehiclesByCategory =>
+        @"
+            SELECT * FROM vehicles
+            WHERE NOT is_removed AND vehicle_category = ANY(@p_license_categories)
+            ORDER BY created_datetime_utc DESC
+        ";
 }
 

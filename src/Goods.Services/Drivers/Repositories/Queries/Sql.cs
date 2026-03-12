@@ -74,5 +74,19 @@ internal static class Sql
             SET last_vacation_datetime_utc = @p_current_datetime_utc
             WHERE NOT is_removed AND id = ANY(@p_driverIds) AND last_vacation_datetime_utc NOT NULL
         ";
+
+    internal static String GetAllDrivers =>
+        @"
+            SELECT * FROM drivers
+            WHERE NOT is_removed
+            ORDER BY created_datetime_utc DESC 
+        ";
+
+    internal static String GetDriversByIds =>
+        @"
+            SELECT * FROM drivers
+            WHERE NOT is_removed AND id = ANY(@p_driverIds)
+            ORDER BY created_datetime_utc DESC 
+        ";
 }
 

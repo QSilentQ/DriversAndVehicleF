@@ -6,7 +6,7 @@ namespace Goods.Services.Histories.Repositories.Converters;
 
 internal static class HistoriesConverter
 {
-    internal static History[] ToHsitories(this HistoryDb[] historyDbs) => [.. historyDbs.Select(ToHistory)];
+    internal static History[] ToHsitories(this HistoryDb[] historyDbs) => historyDbs.Select(ToHistory).ToArray();
 
     internal static History ToHistory(this HistoryDb historyDb)
     {
