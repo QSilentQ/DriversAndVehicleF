@@ -48,20 +48,11 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
             if (driver is null)
                 return Result.Failed("Выбранный водитель не найден.");
 
-            LicenseCategory requiredCategory = vehicleBlank.VehicleCategory!.Value;
-            if (driver.DriverLicenseCategory is null || !driver.DriverLicenseCategory.Contains(requiredCategory))
-                return Result.Failed($"Для управления данным транспортным средством водителю нужна категория прав - {requiredCategory}.");
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            if (vehicleBlank.VehicleCategory == LicenseCategory.Buses)
-            {
-                DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-                Int32 age = FullYears(driver.Birthday, today);
-                Int32 experienceYears = FullYears(driver.Experience, today);
-                if (age < MIN_AGE_FOR_BUS_YEARS)
-                    return Result.Failed($"Для управления автобусом водителю должно быть не менее {MIN_AGE_FOR_BUS_YEARS} лет.");
-                if (experienceYears < MIN_EXPERIENCE_FOR_BUS_YEARS)
-                    return Result.Failed($"Для управления автобусом необходим стаж не менее {MIN_EXPERIENCE_FOR_BUS_YEARS} лет.");
-            }
+            Result validation = ValidateDriverForVehicle(driver, vehicleBlank.VehicleCategory!.Value, today);
+
+            if (!validation.IsSuccess) return validation;
         }
 
         vehicleBlank.Id ??= Guid.NewGuid();
@@ -138,18 +129,6 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
                 driverId = validDrivers[Random.Shared.Next(validDrivers.Length)].Id;
             }
 
-            VehicleBlank blank = new()
-            {
-                Id = vehicle.Id,
-                DriverId = driverId,
-                Name = vehicle.Name,
-                StateNumber = vehicle.StateNumber,
-                VehicleCategory = vehicle.VehicleCategory,
-                AverageSpeed = vehicle.AverageSpeed,
-                FuelConsumption = vehicle.FuelConsumption,
-                ModifiedDatetimeUTC = DateTime.UtcNow,
-                IsRemoved = vehicle.IsRemoved
-            };
             vehiclesRepository.UpdateDriverForVehicle(vehicle.Id, driverId);
 
             if (driverId is not null)
@@ -171,21 +150,29 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         }
     }
 
-    private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)
+    private static Result ValidateDriverForVehicle(Driver driver, LicenseCategory vehicleCategory, DateOnly today)
     {
-        LicenseCategory requiredCategory = vehicle.VehicleCategory;
-        if (driver.DriverLicenseCategory is null || !driver.DriverLicenseCategory.Contains(requiredCategory))
-            return false;
+        if (driver.DriverLicenseCategory is null || !driver.DriverLicenseCategory.Contains(vehicleCategory))
+            return Result.Failed($"Для управления данным транспортным средством водителю нужна категория прав - {vehicleCategory}.");
 
-        if (vehicle.VehicleCategory == LicenseCategory.Buses)
+        if (vehicleCategory == LicenseCategory.Buses)
         {
             Int32 age = FullYears(driver.Birthday, today);
-            Int32 experienceYears = FullYears(driver.Experience, today);
-            if (age < MIN_AGE_FOR_BUS_YEARS || experienceYears < MIN_EXPERIENCE_FOR_BUS_YEARS)
-                return false;
+            Int32 experience = FullYears(driver.Experience, today);
+
+            if (age < MIN_AGE_FOR_BUS_YEARS)
+                return Result.Failed($"Для управления автобусом водителю должно быть не менее {MIN_AGE_FOR_BUS_YEARS} лет.");
+
+            if (experience < MIN_EXPERIENCE_FOR_BUS_YEARS)
+                return Result.Failed($"Для управления автобусом необходим стаж не менее {MIN_EXPERIENCE_FOR_BUS_YEARS} лет.");
         }
 
-        return true;
+        return Result.Success();
+    }
+
+    private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)
+    {
+        return ValidateDriverForVehicle(driver, vehicle.VehicleCategory, today).IsSuccess;
     }
 
     private static Int32 FullYears(DateOnly from, DateOnly to)
