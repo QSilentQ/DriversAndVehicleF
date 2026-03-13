@@ -12,4 +12,5 @@ public interface IVehicleService
     Decimal CalcCostHundredKMCruise(Guid vehicleId);
     void ReassignDriversRandomly();
     IReadOnlyList<Guid> GetAssignedDriverIds();
+    List<DriverVehiclesCount> GetCountAvailibleVehiclesOnDrivers(Guid[] driverIds);
 }

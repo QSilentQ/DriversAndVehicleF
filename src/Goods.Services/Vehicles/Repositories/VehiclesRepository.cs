@@ -114,7 +114,7 @@ internal class VehiclesRepository : IVehiclesRepository
                 Sql.GetVehiclesByCategory,
                 parameters =>
                 {
-                    parameters.AddWithValue("p_license_categories", license_categories);
+                    parameters.AddWithValue("p_license_categories", Array.ConvertAll(license_categories, category => (Int32)category));
                 },
                 (reader) => reader.ToVehicleDb()
             )

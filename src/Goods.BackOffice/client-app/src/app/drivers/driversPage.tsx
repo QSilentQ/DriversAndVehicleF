@@ -21,6 +21,7 @@ import { TablePagination } from '../../shared/components/tablePagination';
 import { ConfirmModalState } from '../../shared/types/confirmModalState';
 import { Pagination } from '../../tools/types/pagination';
 import { DriverEditorModal } from './modals/driverEditorModal';
+import { DriverVehiclesCount } from '../../domain/drivers/driverVehiclesCount';
 import { VehiclesProvider } from '../../domain/vehicles/vehicleProvider';
 
 type DriverEditorModalState = {
@@ -49,10 +50,19 @@ export function DriversPage() {
 		useState<RemoveDriverConfirmModalState>({ driverId: null, ...ConfirmModalState.getClosed() });
 
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [vehiclesCounts, setVehiclesCounts] = useState<DriverVehiclesCount[]>([]);
 
 	useEffect(() => {
 		loadDriversPage({ ...pagination });
 	}, []);
+
+	async function loadVehiclesCountsForDrivers(driverIds: string[]) {
+		const counts =
+			driverIds.length > 0
+				? await VehiclesProvider.getCountAvailibleVehiclesOnDrivers(driverIds)
+				: [];
+		setVehiclesCounts(counts);
+	}
 
 	async function loadDriversPage(newPagination: Pagination) {
 		const driversPage = await DriversProvider.getDriversPage(
@@ -61,7 +71,7 @@ export function DriversPage() {
 		);
 
 		setDrivers(driversPage.values);
-		getCountAvailibleVehicles(driversPage.values);
+		await loadVehiclesCountsForDrivers(driversPage.values.map((d) => d.id));
 
 		setPagination((pagination) => ({
 			...pagination,
@@ -97,10 +107,6 @@ export function DriversPage() {
 			driverId,
 			...ConfirmModalState.getOpen(`Вы действительно хотите удалить водителя "${fio}"?`)
 		});
-	}
-
-	function getCountAvailibleVehicles(drivers: Driver[]) {
-		return VehiclesProvider.getCountAvailibleVehicles(drivers.map((driver) => driver.id));
 	}
 
 	function getDriverStatus(driver: Driver): string {
@@ -174,7 +180,7 @@ export function DriversPage() {
 						<TableBody>
 							{drivers.length === 0 && (
 								<TableRow>
-									<TableCell colSpan={8}>Пусто</TableCell>
+									<TableCell colSpan={9}>Пусто</TableCell>
 								</TableRow>
 							)}
 							{drivers.map((driver) => {
@@ -195,7 +201,9 @@ export function DriversPage() {
 										<TableCell width='12%'>{calculateDriverExperience(driver.experience)}</TableCell>
 										<TableCell width='12%'>{driver.payPerHour ?? '—'}</TableCell>
 										<TableCell width='10%'>{getDriverStatus(driver)}</TableCell>
-										<TableCell width='10%'>{/* Сюда */}</TableCell>
+										<TableCell width='10%'>
+											{vehiclesCounts.find((c) => c.driverId === driver.id)?.vehiclesCount ?? '—'}
+										</TableCell>
 										<TableCell width='12%'>
 											<Button
 												type='icon'

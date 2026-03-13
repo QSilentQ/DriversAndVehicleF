@@ -5,6 +5,7 @@ using Goods.Domain.Shared.Enums;
 using Goods.Domain.Vehicles;
 using Goods.Services.Drivers.Repositories.Interfaces;
 using Goods.Services.Vehicles.Repositories.Interfaces;
+using Goods.Services.Vehicles.Repositories.Models;
 using Goods.Tools.Extensions;
 using Goods.Tools.Types.Results;
 
@@ -177,10 +178,11 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
         return Result.Success();
     }
 
-    public Int32 GetCountAvailibleVehicles(Guid[] driverIds)
+    public List<DriverVehiclesCount> GetCountAvailibleVehiclesOnDrivers(Guid[] driverIds)
     {
         Driver[] drivers = driversRepository.GetDriversByIds(driverIds);
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+        List<DriverVehiclesCount> availibleVehicles = [];
 
         LicenseCategory[] licenseCategories = drivers
             .SelectMany(driver => driver.DriverLicenseCategory)
@@ -189,9 +191,13 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
 
         Vehicle[] vehicles = vehiclesRepository.GetVehiclesByCategory(licenseCategories);
 
-        Int32 count = 0;
+        foreach (Driver driver in drivers) {
+            Int32 vehiclesCount = vehicles.Where(vehicle => IsDriverValidForVehicle(driver, vehicle, today)).ToArray().Length;
 
-        return count;
+            availibleVehicles.Add(new DriverVehiclesCount(driver.Id, vehiclesCount));
+        }
+
+        return availibleVehicles;
     }
 
     private static Boolean IsDriverValidForVehicle(Driver driver, Vehicle vehicle, DateOnly today)

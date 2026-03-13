@@ -36,4 +36,10 @@ public class VehiclesController(IVehicleService vehicleService) : AppController
     {
         return vehicleService.CalcCostHundredKMCruise(vehicleId);
     }
+
+    [HttpGet("vehicles/get_count_availible_vehicles")]
+    public List<DriverVehiclesCount> GetCountAvailibleVehiclesOnDrivers([FromQuery] Guid[] driverIds)
+    {
+        return vehicleService.GetCountAvailibleVehiclesOnDrivers(driverIds);
+    }
 }

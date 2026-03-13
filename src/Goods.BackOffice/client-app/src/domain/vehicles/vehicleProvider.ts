@@ -1,5 +1,6 @@
 import { Page } from "../../tools/types/page";
 import { Result } from "../../tools/types/results/result";
+import { DriverVehiclesCount } from "../drivers/driverVehiclesCount";
 import { mapToVehicle, mapToVehiclesPage, Vehicle } from "./vehicle";
 import { VehicleBlank } from "./vehicleBlank";
 
@@ -60,7 +61,7 @@ export class VehiclesProvider {
     return { totalPrice: Number(json) };
   }
 
-  public static async getCountAvailibleVehicles(driverIds: string[]): Promise<number | 0> {
+  public static async getCountAvailibleVehiclesOnDrivers(driverIds: string[]): Promise<DriverVehiclesCount[]> {
     let params = '';
     for (const id of driverIds) {
       params += `driverIds=${id}&`;
@@ -70,9 +71,9 @@ export class VehiclesProvider {
     const response = await fetch(`/vehicles/get_count_availible_vehicles?${params}`, {
       method: 'GET',
       headers: this.headers
-    })
+    });
     const json = await response.json();
 
-    return Number(json);
+    return json as DriverVehiclesCount[];
   }
 }
