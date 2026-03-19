@@ -41,3 +41,14 @@ export function mapToDriver(data: any): Driver {
     lastVacation != null ? new Date(lastVacation) : null,
   );
 }
+
+export interface DriverSource {
+  id: string;
+  firstName: string;
+  secondName: string;
+  lastName: string;
+  gender: Gender,
+  driverLicenseCategory: DriverLicenseCategory[],
+  birthday: Date,
+  experience: Date,
+}

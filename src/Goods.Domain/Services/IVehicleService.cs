@@ -13,4 +13,5 @@ public interface IVehicleService
     void ReassignDriversRandomly();
     IReadOnlyList<Guid> GetAssignedDriverIds();
     List<DriverVehiclesCount> GetCountAvailibleVehiclesOnDrivers(Guid[] driverIds);
+    Page<VehicleDetail> GetVehicleDetails(Int32 page, Int32 countInPage);
 }

@@ -42,4 +42,10 @@ public class VehiclesController(IVehicleService vehicleService) : AppController
     {
         return vehicleService.GetCountAvailibleVehiclesOnDrivers(driverIds);
     }
+
+    [HttpGet("vehicles/detail")]
+    public Page<VehicleDetail> GetVehicleDetails([FromQuery] Int32 page, [FromQuery] Int32 countInPage)
+    {
+        return vehicleService.GetVehicleDetails(page, countInPage);
+    }
 }

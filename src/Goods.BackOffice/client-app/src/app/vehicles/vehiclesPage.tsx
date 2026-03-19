@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Vehicle } from '../../domain/vehicles/vehicle';
+import { VehicleDetail } from '../../domain/vehicles/vehicleDetail';
 import { VehiclesProvider } from '../../domain/vehicles/vehicleProvider';
 import { VehicleCategory } from '../../domain/vehicles/enums/vehicleCategory';
 import { Button } from '../../shared/components/buttons/button';
@@ -20,7 +21,6 @@ import { TablePagination } from '../../shared/components/tablePagination';
 import { ConfirmModalState } from '../../shared/types/confirmModalState';
 import { Pagination } from '../../tools/types/pagination';
 import { VehicleEditorModal } from './modals/vehicleEditorModal';
-import { DriversProvider } from '../../domain/drivers/driversProvider';
 import { Driver } from '../../domain/drivers/driver';
 
 type VehicleEditorModalState = {
@@ -33,8 +33,7 @@ interface RemoveVehicleConfirmModalState extends ConfirmModalState {
 }
 
 export function VehiclesPage() {
-	const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-	const [drivers, setDrivers] = useState<Driver[]>([]);
+	const [vehicles, setVehicles] = useState<VehicleDetail[]>([]);
 	const [pagination, setPagination] = useState<Pagination>(Pagination.default);
 
 	const [vehicleEditorModalState, setVehicleEditorModalState] = useState<VehicleEditorModalState>({
@@ -51,16 +50,10 @@ export function VehiclesPage() {
 
 	useEffect(() => {
 		loadVehiclesPage({ ...pagination });
-		loadDrivers();
 	}, []);
 
-	async function loadDrivers() {
-		const drivers = await DriversProvider.getDriversPage(1, 1000);
-		setDrivers(drivers.values);
-	}
-
 	async function loadVehiclesPage(newPagination: Pagination) {
-		const vehiclesPage = await VehiclesProvider.getVehiclesPage(
+		const vehiclesPage = await VehiclesProvider.GetALLVehiclesDetailed(
 			newPagination.page,
 			newPagination.countInPage
 		);
@@ -100,11 +93,9 @@ export function VehiclesPage() {
 		});
 	}
 
-	function getDriverName(driverId: string) {
-		const driver = drivers.find((driver) => driver.id === driverId);
+	function getDriverName(driver: Driver | null) {
 		if (driver == null) return '—';
-		const { firstName, secondName, lastName } = driver;
-		return `${firstName} ${secondName} ${lastName}`;
+		return `${driver.firstName} ${driver.secondName} ${driver.lastName}` || '—';
 	}
 
 	async function calcTripCost(vehicle: Vehicle) {
@@ -175,7 +166,7 @@ export function VehiclesPage() {
 								return (
 									<TableRow key={`vehicle__${vehicle.id}`}>
 										<TableCell width='10%'>{vehicle.name}</TableCell>
-										<TableCell width='14%'>{vehicle.driverId != null ? getDriverName(vehicle.driverId) : '—'}</TableCell>
+										<TableCell width='14%'>{getDriverName(vehicle.driver)}</TableCell>
 										<TableCell width='14%'>{vehicle.stateNumber}</TableCell>
 										<TableCell width='10%'>
 											{vehicle.vehicleCategory != null

@@ -8,6 +8,7 @@ using Goods.Services.Vehicles.Repositories.Interfaces;
 using Goods.Services.Vehicles.Repositories.Models;
 using Goods.Tools.Extensions;
 using Goods.Tools.Types.Results;
+using System.Xml.Linq;
 
 namespace Goods.Services.Vehicles;
 
@@ -67,6 +68,42 @@ public class VehiclesService(IVehiclesRepository vehiclesRepository, IDriversRep
     public Page<Vehicle> GetVehiclesPage(Int32 page, Int32 countInPage)
     {
         return vehiclesRepository.GetVehiclesPage(page, countInPage);
+    }
+
+    public Page<VehicleDetail> GetVehicleDetails(Int32 page, Int32 countInPage)
+    {
+        Page<Vehicle> vehiclesPage = vehiclesRepository.GetVehiclesPage(page, countInPage);
+        Vehicle[] vehicles = vehiclesPage.Values;
+
+        Guid[] driverIds = vehicles
+            .Where(v => v.DriverId.HasValue)
+            .Select(v => v.DriverId!.Value)
+            .ToArray();
+
+        Driver[] drivers = driversRepository.GetDriversByIds(driverIds);
+
+        Dictionary<Guid, Driver> driversById = drivers.ToDictionary(d => d.Id);
+
+        return vehiclesPage.Convert(v =>
+        {
+            Driver? driver = null;
+
+            if (v.DriverId.HasValue)
+            {
+                driversById.TryGetValue(v.DriverId.Value, out driver);
+            }
+
+            return new VehicleDetail(
+                v.Id,
+                v.DriverId,
+                v.Name,
+                v.StateNumber,
+                v.VehicleCategory,
+                v.AverageSpeed,
+                v.FuelConsumption,
+                driver
+            );
+        });
     }
 
     public Vehicle? GetVehicle(Guid vehicleId)

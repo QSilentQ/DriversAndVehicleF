@@ -3,6 +3,7 @@ import { Result } from "../../tools/types/results/result";
 import { DriverVehiclesCount } from "../drivers/driverVehiclesCount";
 import { mapToVehicle, mapToVehiclesPage, Vehicle } from "./vehicle";
 import { VehicleBlank } from "./vehicleBlank";
+import { mapToVehiclesDetailsPage, VehicleDetail } from "./vehicleDetail";
 
 export class VehiclesProvider {
   private static readonly headers: HeadersInit = [
@@ -31,6 +32,16 @@ export class VehiclesProvider {
     return mapToVehiclesPage(json);
   }
 
+  public static async GetALLVehiclesDetailed(page: number, countInPage: number): Promise<Page<VehicleDetail>> {
+    const response = await fetch(`/vehicles/detail?page=${page}&countInPage=${countInPage}`, {
+      method: "GET",
+      headers: this.headers,
+    });
+    const json = await response.json();
+
+    return mapToVehiclesDetailsPage(json);
+  }
+
   public static async getVehicleById(vehicleId: string): Promise<Vehicle | null> {
     const response = await fetch(`/vehicles/get_by_id?vehicleId=${vehicleId}`, {
       method: 'GET',
@@ -38,7 +49,7 @@ export class VehiclesProvider {
     })
     const json = await response.json();
 
-    return mapToVehicle(json);
+    return mapToVehicle(json);  
   }
 
   public static async markVehicleAsRemoved(vehicleId: string): Promise<Result> {

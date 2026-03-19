@@ -32,3 +32,13 @@ export function mapToVehicle(data: any): Vehicle {
     data.fuelConsumption,
   );
 }
+
+export interface VehicleSource {
+  id: string,
+  driverId: string | null,
+  name: string,
+  stateNumber: string,
+  vehicleCategory: VehicleCategory,
+  averageSpeed: number,
+  fuelConsumption: number,
+}
